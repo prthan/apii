@@ -1,0 +1,25 @@
+<div class="tabs-header fl-g0 fl">
+  <div class="tabs-strip-actions fl-g0 fl fl-ac">
+    <a class="tabs-strip-action fl-g0" title="Add Quick Inspection Tab" ng-click="view.addQuickInspectionTab()"><i class="fas fa-plus-circle"></i></a>
+    <a class="tabs-strip-action fl-g0" title="Scroll Tabs Left" ng-click="view.scrollTabsLeft()"><i class="fas fa-arrow-left"></i></a>
+    <a class="tabs-strip-action fl-g0" title="Scroll Tabs Right" ng-click="view.scrollTabsRight()"><i class="fas fa-arrow-right"></i></a>
+  </div>
+  <div class="tabs-header-strip fl-g1">
+    <div class="tabs-header-track">
+      <div class="tab" ng-repeat="oid in view.tabs" 
+                       data-oid="{{oid}}" 
+                       data-state="{{oid==view.inspection.oid ? 'selected' : ''}}" 
+                       data-index="{{$index}}"
+                       ng-click="view.selectTab(oid, $event)">
+        <div class="tab-cell fl fl-ac">
+          <div class="tab-actions fl-g0"><a class="tab-action" ng-click="view.showTabMenu(oid, $event)"><i class="fas fa-caret-square-down"></i></a></div>
+          <div class="text fl-g0">{{view.ws.inspections[oid].name}}</div>
+          <div class="tab-actions fl-g0"><a class="tab-action" ng-click="view.closeTab(oid, $event)"><i class="fas fa-times"></i></a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="tabs-body fl-g1 fl fl-column" ng-show="view.tabs.length>0">
+  <div class="inspection-tab fl-g1 fl fl-column" zn-template="ws/inspection-tab.html"></div>
+</div>

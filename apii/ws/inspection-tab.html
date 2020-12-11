@@ -1,0 +1,56 @@
+<div class="service fl-g0 fl fl-ac">
+  <div zn-dropdownfield class="http-method fl-g0" name="http-method" value="view.inspection.target.method" items="module.data.lovs.httpMethods" placeholder="HTTP Method"></div>
+  <div zn-textfield class="url fl-g1" name="firstname" value="view.inspection.target.endpoint" placeholder="Endpoint"></div>
+  <div zn-button class="send-action fl-g0" text="Send" icon="fas fa-paper-plane" action="'send'" onaction="view.send($event)"></div>
+</div>
+<div class="service-io fl-g1 fl">
+  <div class="service-req fl-g1 fl fl-column">
+    <div class="panel-tab fl-g0">
+      <div class="label">Request</div>
+    </div>
+    <div class="panel-body fl-g1 fl fl-column">
+      <div class="panel-section fl-g0 fl fl-ac">
+        <div class="panel-section-label fl-g1">Headers</div>
+        <div class="panel-section-actions fl-g0 fl fl-ac">
+          <a class="panel-section-action fl-g0" title="Add Authorization Header"><i class="far fa-address-card"></i></a>
+          <a class="panel-section-action fl-g0" title="Add Header" ng-click="view.addRequestHeader($event)"><i class="fas fa-plus-circle"></i></a>
+        </div>
+      </div>
+      <div class="http-headers fl-g0">
+        <div class="http-header fl fl-ac" ng-repeat="item in view.inspection.request.headers" data-index="{{$index}}">
+          <div class="header-name fl-g0" zn-editable onedit="view.updateRequestHeader($index, 'header', $event)">{{item.header}}</div>
+          <div class="header-value fl-g1" zn-editable onedit="view.updateRequestHeader($index, 'value', $event)">{{item.value}}</div>
+          <a title="Delete Header" class="header-action fl-g0" ng-click="view.deleteRequestHeader($index, $event)"><i class="far fa-trash-alt"></i></a>
+        </div>
+      </div>
+      <div class="panel-section fl-g0 fl fl-ac">
+        <div class="panel-section-label fl-g1">Content</div>
+      </div>
+      <div class="service-req-editor fl-g1 editor"></div>
+    </div>
+  </div>
+  <div class="panel-splitter fl-g0">
+    <div class="panel-splitter-filler"></div>
+    <div class="panel-splitter-handle" zn-draggable tracker="true" ondragstart="view.panelSplit($event)" ondragmove="view.panelSplit($event)" ondragend="view.panelSplit($event)"></div>
+  </div>
+  <div class="service-res fl-g1 fl fl-column">
+    <div class="panel-tab fl-g0">
+      <div class="label">Response</div>
+    </div>
+    <div class="panel-body fl-g1 fl fl-column">
+      <div class="panel-section fl-g0 fl fl-ac">
+        <div class="panel-section-label fl-g1">Headers</div>
+      </div>
+      <div class="http-headers fl-g0">
+        <div class="http-header fl fl-ac" ng-repeat="item in view.inspection.response.headers">
+          <div class="header-name fl-g0">{{item.header}}</div>
+          <div class="header-value fl-g1">{{item.value}}</div>
+        </div>
+      </div>
+      <div class="panel-section fl-g0 fl fl-ac">
+        <div class="panel-section-label fl-g1">Content</div>
+      </div>
+      <div class="service-res-editor editor fl-g1"></div>
+    </div>
+  </div>
+</div>

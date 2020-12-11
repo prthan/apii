@@ -1,0 +1,65 @@
+<div class="app-header fl-g0 fl fl-ac">
+  <a class="app-action" title="Menu" ng-click="view.showAppMenu($event)"><i class="fas fa-bars"></i></a>
+  <img ng-src="{{env.images}}/logo/logo-small.png">
+</div>
+
+<div class="ws-header fl-g0">
+  <div class="item-actions">
+    <a title="Edit Workspace" class="item-action"><i class="fas fa-pencil-alt" ng-click="view.showEditWSDialog('edit')"></i></a>
+    <a title="Delete Workspace" class="item-action"><i class="fas fa-trash" ng-click="view.deleteWorkspace()"></i></a>
+    <a title="Add Set" class="item-action add-set" ng-click="view.showEditSetDialog('new', null, $event)"><i class="fas fa-folder-plus"></i></a>
+  </div>
+  <div class="ws-name">{{view.ws.name}}</div>
+  <div class="ws-descr">{{view.ws.descr}}</div>
+</div>
+
+<div class="ws-sets fl-g1">
+  <div class="set" data-state="expanded" ng-repeat="set in view.ws.sets" data-set-oid="{{set.oid}}" data-index="{{$index}}">
+    <div class="set-name fl fl-ac" ng-click="view.toggleSet(set.oid, $event)">
+      <div class="icon fl-g0">
+        <!--i class="expanded fas fa-folder-open"></i><i class="collapsed fas fa-folder"></i-->
+        <i class="expanded fas fa-caret-down"></i><i class="collapsed fas fa-caret-right"></i>
+      </div>
+      <div class="text fl-g1">{{set.name}}</div>
+      <div class="item-actions fl-g0">
+        <a title="Edit Set" class="item-action"><i class="fas fa-pencil-alt" ng-click="view.showEditSetDialog('edit', $index, $event)"></i></a>
+        <a title="Delete Set" class="item-action" ng-click="view.deleteSet($index, $event)"><i class="fas fa-trash"></i></a>
+        <a title="Add Inspection" class="item-action" ng-click="view.showEditInspectionDialog('new', null, set.oid, $event)"><i class="fas fa-plus-circle"></i></a>
+      </div>
+    </div>
+    <div class="inspections">
+      <div class="inspection fl fl-ac" ng-repeat="oid in set.inspections" data-ins-oid="{{oid}}" data-index="{{$index}}"
+      data-state="{{view.ws.inspections[oid].state}}" ng-click="view.showInspection(oid, $event)">
+        <div class="icon fl-g0"><i class="fas fa-paper-plane"></i></div>
+        <div class="state-indicator fl-g0"><span><i class="fas fa-circle"></i></span></div>        
+        <div class="text fl-g1">{{view.ws.inspections[oid].name}}</div>
+        <div class="item-actions fl-g0">
+          <a title="Edit Inspection" class="item-action"><i class="fas fa-pencil-alt" ng-click="view.showEditInspectionDialog('edit', oid, set.oid, $event)"></i></a>
+          <a title="Delete Inspection" class="item-action" ng-click="view.deleteSetInspection($parent.$index, $index, $event)"><i class="fas fa-trash"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="set-buffer" ng-if="view.ws.sets.length>0 && view.ws.untitled.length>0">&nbsp;</div>
+  <div class="set untitled" data-state="expanded" data-set-oid="{{'untitled-set'}}">
+    <!--div class="set-name fl fl-ac" ng-click="view.toggleSet('untitled-set', $event)">
+      <div class="icon fl-g0"><i class="expanded fas fa-caret-down"></i><i class="collapsed fas fa-caret-right"></i></div>
+      <div class="text fl-g1">{Uncategorized}</div>
+    </div-->
+    <div class="inspections">
+      <div class="inspection fl fl-ac" ng-repeat="oid in view.ws.untitled" data-ins-oid="{{oid}}" data-index="{{$index}}"
+      data-state="{{view.ws.inspections[oid].state}}" ng-click="view.showInspection(oid, $event)">
+        <div class="icon fl-g0"><i class="fas fa-paper-plane"></i></div>
+        <div class="state-indicator fl-g0"><span><i class="fas fa-circle"></i></span></div>        
+        <div class="text fl-g1">{{view.ws.inspections[oid].name}}</div>
+        <div class="item-actions fl-g0">
+          <a title="Edit Inspection" class="item-action"><i class="fas fa-pencil-alt" ng-click="view.showEditInspectionDialog('edit-untitled', oid, null, $event)"></i></a>
+          <a title="Delete Inspection" class="item-action" ng-click="view.deleteQuickInspection($index, $event)"><i class="fas fa-trash"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+

@@ -1,0 +1,61 @@
+{
+  "name"         : "apii",
+  "version"      : "0.2",
+  "title"        : "API Inspector",
+  "template"     : "module/layout.html",
+  "class"        : "apii.Module",
+  "script"       : "module/index.js",
+  "style"        : "module/index.css",
+  
+  "includes":
+  {
+    "scripts"    : ["../app.js"],
+    "styles"     : ["../app.css"]
+  },
+  
+  "views": 
+  {
+    "ws":
+    {
+      "class"    : "apii.view.Workspace",
+      "template" : "ws/view.html",
+      "script"   : "ws/view.js",
+      "style"    : "ws/view.css"
+    }
+  },
+
+  "routes":
+  {
+    "/ws"     : {"view": "ws", "default": true},
+    "/ws/@id" : {"view": "ws"}
+  },
+
+  "fragments":
+  [
+    "ws/navigator.html",
+    "ws/tabs.html",
+    "ws/inspection-tab.html"
+  ],
+
+  "data":
+  {
+    "lovs":
+    {
+      "httpMethods":
+      [
+        {"value" : "GET", "label" : "GET"},
+        {"value" : "PUT", "label" : "PUT"},
+        {"value" : "POST", "label" : "POST"},
+        {"value" : "DELETE", "label" : "DELETE"},
+        {"value" : "PATCH", "label" : "PATCH"},
+        {"value" : "OPTIONS", "label" : "OPTIONS"}
+      ],
+      "authHeaderType":
+      [
+        {"value": "basic", "label": "Basic"},
+        {"value": "bearer", "label": "Bearer"}
+      ]      
+    }
+  }
+
+}

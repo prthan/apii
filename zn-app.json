@@ -1,0 +1,60 @@
+{
+  "name": "apii",
+  "version": "0.2",
+  "title": "APIi",
+
+  "scripts":
+  [
+    "external/cm/codemirror.js",
+    "external/cm/addon/edit/matchbrackets.js",
+    "external/cm/addon/edit/closebrackets.js",
+    "external/cm/addon/fold/foldcode.js",
+    "external/cm/addon/fold/foldgutter.js",
+    "external/cm/addon/fold/brace-fold.js",
+    "external/cm/addon/fold/indent-fold.js",
+    "external/cm/addon/fold/xml-fold.js",
+    "external/cm/mode/javascript/javascript.js",
+    "external/cm/mode/xml/xml.js",
+    "app/index.js"
+  ],
+
+  "styles":
+  [
+    "external/cm/codemirror.css",
+    "external/cm/addon/fold/foldgutter.css",
+    "app/font-fa.css",
+    "app/index.css"
+  ],
+
+  "imports":
+  [
+    "../../zn-ui/workspace/zn/external-lib.json",
+    "../../zn-ui/workspace/zn/zn-lib.json",
+    "../../zn-ui/workspace/zn-ui/zn-ui-lib.json"
+  ],
+
+  "modules": ["apii"],
+  
+  "resources": ["res"],
+
+  "bundled": "Y",
+  
+  "environments":
+  {
+    "dev":
+    {
+      "ctx": "/",
+      "api": "/api",
+      "res": "/res",
+      "images": "/res/images"
+    },
+    "prod":
+    {
+      "ctx": "/",
+      "api": "/api",
+      "res": "res",
+      "images": "res/images"
+    }
+
+  }
+}

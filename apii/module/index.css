@@ -1,0 +1,29 @@
+html, body, .zn-module, [zn-route][zn-view]
+{
+  width: 100%;
+  height: 100%;
+}
+
+
+.ws-layout
+{
+  position: relative;
+}
+
+.fl {display: flex;}
+.fl.fl-column {flex-direction: column;}
+.fl.fl-ac {align-items: center;}
+.fl.fl-at {align-items: flex-start;}
+.fl.fl-ab {align-items: flex-end;}
+.fl.fl-jc {justify-content: center;}
+.fl-g0 {flex-grow: 0}
+.fl-g1 {flex-grow: 1; flex-basis: 0;}
+
+.lean-scroll::-webkit-scrollbar {width: 5px; height: 5px}
+.lean-scroll::-webkit-scrollbar-track {background: #ddd;}
+.lean-scroll::-webkit-scrollbar-thumb {background: #bbb;}
+
+.CodeMirror {height: 100%; font-size: 12px; line-height: 20px; font-family: 'Source Code Pro', monospace;}
+.CodeMirror .CodeMirror-scroll {height: inherit;}
+.CodeMirror-selected {background:#dbf0ff !important;}
+.CodeMirror-wrap pre.CodeMirror-line {word-break: break-all;}
