@@ -15,6 +15,7 @@
     "external/cm/addon/fold/xml-fold.js",
     "external/cm/mode/javascript/javascript.js",
     "external/cm/mode/xml/xml.js",
+    "external/socket.io.js",
     "app/index.js"
   ],
 
@@ -28,9 +29,9 @@
 
   "imports":
   [
-    "../../zn-ui/workspace/zn/external-lib.json",
-    "../../zn-ui/workspace/zn/zn-lib.json",
-    "../../zn-ui/workspace/zn-ui/zn-ui-lib.json"
+    "../../../zn-ui/workspace/zn/external-lib.json",
+    "../../../zn-ui/workspace/zn/zn-lib.json",
+    "../../../zn-ui/workspace/zn-ui/zn-ui-lib.json"
   ],
 
   "modules": ["apii"],

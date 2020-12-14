@@ -1,0 +1,22 @@
+{
+  "mode"           : "development",
+  "name"           : "APIi Agent",
+  "id"             : "apii-agemt",
+  "home"           : "e:/workspaces/apii/dist",
+
+  "logger"         :
+  {
+    "level"        : "DEBUG",
+    "colors"        : true
+  },
+  
+  "listener":
+  {
+    "address"    : "0.0.0.0",
+    "port"       : 81
+  },
+
+  "context": "/apii/agent",
+  "origin": "http://localhost:8080"
+
+}

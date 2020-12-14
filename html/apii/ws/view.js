@@ -24,6 +24,7 @@
       
       this.tabs=[this.inspection.oid];
       this.sets=[];
+      this.config={};
     }
 
     init()
@@ -31,7 +32,9 @@
       let view=this;
       view.setupUI();
       view.setupEventHandlers();
+      view.loadConfig();
       view.loadWS();
+      view.connectToAgent();
     }
     
     setupUI()
@@ -43,9 +46,61 @@
     setupEventHandlers()
     {
       let view=this;
+
+      $(".upload").on("change", (evt)=>
+      {
+        let file=evt.target.files[0];
+        if(file==null) return;
+
+        let fr=new FileReader();
+        fr.onload=(evt)=>view.importWS(evt.target.result);
+        fr.readAsText(file);
+      });
+
       view._updatePanels=()=>window.setTimeout(()=>view.updatePanels(), 10);
       view._updateTabScrollPosition=()=>window.setTimeout(()=>view.updateTabScrollPosition(), 0);
       view._saveWS=zn.utils.debounce(()=>view.saveWS(), 300);
+    }
+
+    loadConfig()
+    {
+      let view=this;
+      let config=window.localStorage.getItem(`/apii/config`);
+      if(!config)
+      {
+        config=JSON.stringify({
+          version: "0.2",
+          oid: zn.shortid()
+        });
+        window.localStorage.setItem(`/apii/config`, config);
+      }
+      view.config=JSON.parse(config);
+    }
+
+    saveConfig()
+    {
+      let view=this;
+      window.localStorage.setItem(`/apii/config`, JSON.stringify(zn.utils.copyObj(view.config)));
+    }
+
+    connectToAgent()
+    {
+      let view=this;
+      if(!view.config.proxy) return;
+
+      console.info("[APIi]", `connecting to agent at ${view.config.proxy}`)
+      view.socket=io(`${view.config.proxy}`,{
+        path: "/apii/agent",
+        withCredentials: true
+      });
+      view.socket.on("connect", ()=>
+      {
+        console.info("[APIi]", `connected to agent at ${view.config.proxy}`);
+        console.info("[APIi]", `announcing to agent`);
+        view.socket.emit("/apii/announce", {oid: view.config.oid});
+      })
+      view.socket.on("/apii/announce/ack", (socmsg)=>console.info("[APIi]", `announcing acknowledged by agent`));
+      view.socket.on("/apii/receive", (socmsg)=>view.onReceive(socmsg));
     }
 
     emptyWS()
@@ -105,6 +160,37 @@
     clearWS()
     {
       let view=this;
+    }
+
+    exportWS($event)
+    {
+      $event.preventDefault();
+      let view=this;
+      
+      $(".download").attr("href", `data:application/json;base64,${btoa(JSON.stringify(zn.utils.copyObj(view.ws)))}`);
+      $(".download").attr("download", view.ws.name.toLowerCase().replace(/ +/g,"-")+".json");
+      window.setTimeout(()=>$(".download").get()[0].click(),10);
+    }
+
+    triggerImportWS($event)
+    {
+      $event.preventDefault();
+      $(".upload").val(null).click();
+    }
+    
+    importWS(data)
+    {
+      let ws=JSON.parse(data);
+      ws.oid=zn.shortid();
+      let workspaces=JSON.parse(window.localStorage.getItem("/apii/workspaces"));
+      workspaces.push(ws.oid);
+
+      window.localStorage.setItem("/apii/workspaces", JSON.stringify(workspaces));
+      window.localStorage.setItem("/apii/currentws", ws.oid);
+      window.localStorage.setItem(`/apii/workspace/${ws.oid}`, JSON.stringify(ws));
+
+      window.location.hash=`#!/ws/${ws.oid}`;
+
     }
 
     initEditors()
@@ -489,8 +575,11 @@
     {
       let view=this;
       let ws=view.emptyWS();
-      ws.name=obj.name;
-      ws.descr=obj.descr;
+      if(obj)
+      {
+        ws.name=obj.name;
+        ws.descr=obj.descr;
+      }
       let workspaces=JSON.parse(window.localStorage.getItem("/apii/workspaces"));
       workspaces.push(ws.oid);
 
@@ -517,13 +606,16 @@
       let workspaces=JSON.parse(window.localStorage.getItem("/apii/workspaces"));
       let index=workspaces.indexOf(oid);
       workspaces.splice(index, 1);
-
-      let currentws=workspaces[0];
       window.localStorage.setItem("/apii/workspaces", JSON.stringify(workspaces));
-      window.localStorage.setItem("/apii/currentws", currentws);
       window.localStorage.removeItem(`/apii/workspace/${oid}`);
 
-      window.location.hash=`#!/ws/${currentws}`;
+      if(workspaces.length>0)
+      {
+        let currentws=workspaces[0];
+        window.localStorage.setItem("/apii/currentws", currentws);
+        window.location.hash=`#!/ws/${currentws}`;
+      }
+      else view.addWorkspace();
     }
 
     listWorkspaces()
@@ -731,6 +823,14 @@
       let view=this;
       view.savePanels();
       view.saveWS();
+
+      let inspection=zn.utils.copyObj(view.inspection);
+      view.socket.emit("/apii/send", inspection);
+    }
+
+    onReceive(inspection)
+    {
+      console.info(inspection);
     }
 
     showAppMenu($evt)
@@ -744,7 +844,7 @@
       popup.show();
     }
 
-    onAppMenuAction(action)
+    onAppMenuAction(action, $event)
     {
       let view=this;
       let popup=zn.ui.components.Popup.get("app-menu");
@@ -752,9 +852,9 @@
 
       if(action=="new-ws") view.showEditWSDialog('new');
       if(action=="switch-ws") view.showSelectWSDialog();
-      if(action=="import-ws") console.log('import ws');
-      if(action=="export-ws") console.log('export ws');
-      if(action=="prefs") console.log('prefs');
+      if(action=="import-ws") view.triggerImportWS($event);
+      if(action=="export-ws") view.exportWS($event);
+      if(action=="show-config") view.showConfigDialog();
     }
 
     showSelectWSDialog()
@@ -769,6 +869,24 @@
     {
       let oid=$event.item.oid;
       window.location.hash=`#!/ws/${oid}`;
+    }
+
+    showConfigDialog()
+    {
+      let view=this;
+      view.editconfig={...view.config};
+      let dialog=zn.ui.components.Dialog.get("config-dialog");
+      dialog.show();
+    }
+
+    onConfigDialogAction($evt)
+    {
+      let view=this;
+      if($evt.action=="cancel") return;
+      
+      zn.ui.components.Dialog.get("config-dialog").hide();      
+      view.config={...view.editconfig};
+      view.saveConfig();
     }
   }
 

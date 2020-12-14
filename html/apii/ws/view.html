@@ -3,6 +3,9 @@
   <div class="tabs fl-g1 fl fl-column" zn-template="ws/tabs.html"></div>
 </div>
 
+<a href="#download" class="download">Download</a>
+<input type="file" class="upload"/>
+
 <div zn-dialog name="edit-set-dialog" dialogtitle="Set" actions="view.dialogActions.OKCANCEL" onaction="view.onEditSetDialogAction($event)" class="name-descr-dialog">
   <div class="edit-form fl fl-column">
     <form autocomplete="off">
@@ -31,6 +34,14 @@
   </div>
 </div>
 
+<div zn-dialog name="config-dialog" dialogtitle="Configuration" actions="view.dialogActions.OKCANCEL" onaction="view.onConfigDialogAction($event)" class="config-dialog">
+  <div class="edit-form fl fl-column">
+    <form autocomplete="off">
+      <div zn-textfield class="fl-g0" name="proxy-location" label="APIi Proxy Location" value="view.editconfig.proxy"></div>
+    </form>
+  </div>
+</div>
+
 <div zn-dialog name="ws-list-dialog" dialogtitle="Select Workspace" actions="view.dialogActions.CANCEL" class="ws-list-dialog">
   <div zn-list class="ws-list" name="ws-list" items="view.wslist" multiselect="false" trackscroll="false" onselect="view.onSelectWS($event)"></div>
 </div>
@@ -43,12 +54,12 @@
 </div>
 
 <div zn-popup name="app-menu" class="popup-menu-items app-menu" source=".app-action" showat="bottom">
-  <a class="popup-menu-item" ng-click="view.onAppMenuAction('new-ws')"><i class="fas fa-plus-circle"></i><span class="popup-menu-item-text">New Workspace</span></a>
-  <a class="popup-menu-item" ng-click="view.onAppMenuAction('switch-ws')"><i class="fas fa-random"></i><span class="popup-menu-item-text">Switch Workspace</span></a>
-  <a class="popup-menu-item"><i class="fas fa-arrow-circle-down"></i><span class="popup-menu-item-text">Import Workspace</span></a>
-  <a class="popup-menu-item"><i class="fas fa-arrow-circle-up"></i><span class="popup-menu-item-text">Export Workspace</span></a>
+  <a class="popup-menu-item" ng-click="view.onAppMenuAction('new-ws', $event)"><i class="fas fa-plus-circle"></i><span class="popup-menu-item-text">New Workspace</span></a>
+  <a class="popup-menu-item" ng-click="view.onAppMenuAction('switch-ws', $event)"><i class="fas fa-random"></i><span class="popup-menu-item-text">Switch Workspace</span></a>
+  <a class="popup-menu-item" ng-click="view.onAppMenuAction('import-ws', $event)"><i class="fas fa-arrow-circle-down"></i><span class="popup-menu-item-text">Import Workspace</span></a>
+  <a class="popup-menu-item" ng-click="view.onAppMenuAction('export-ws', $event)"><i class="fas fa-arrow-circle-up"></i><span class="popup-menu-item-text">Export Workspace</span></a>
   <div class="popup-menu-item-divider">&nbsp;</div>
-  <a class="popup-menu-item"><i class="fas fa-cogs"></i><span class="popup-menu-item-text">Preferences</span></a>
+  <a class="popup-menu-item" ng-click="view.onAppMenuAction('show-config', $event)"><i class="fas fa-cogs"></i><span class="popup-menu-item-text">Configuration</span></a>
 </div>
 
 
