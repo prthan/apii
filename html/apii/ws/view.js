@@ -167,7 +167,8 @@
       $event.preventDefault();
       let view=this;
       
-      $(".download").attr("href", `data:application/json;base64,${btoa(JSON.stringify(zn.utils.copyObj(view.ws)))}`);
+      let str=btoa(unescape(encodeURIComponent(JSON.stringify(zn.utils.copyObj(view.ws)))));
+      $(".download").attr("href", `data:application/json;base64,${str}`);
       $(".download").attr("download", view.ws.name.toLowerCase().replace(/ +/g,"-")+".json");
       window.setTimeout(()=>$(".download").get()[0].click(),10);
     }
@@ -224,9 +225,13 @@
     {
       let view=this;
 
-      //console.log('updating panels', view.inspection);
+      console.log('updating panels', view.inspection);
       view.editors.request.setValue(view.inspection.request.content);
+      $(".service-req .panel-body").scrollTop(0);
+
       view.editors.response.setValue(view.inspection.response.content);
+      view.editors.response.setOption("mode", view.contentMode(view.inspection.response.headers));
+      $(".service-res .panel-body").scrollTop(0);
       let $leftPanel=$(".service-req");
       if(view.inspection.splitState) $leftPanel.css("flex-grow", "0").css("flex-basis", "unset").width(view.inspection.splitState.leftPanelWidth);
       else $leftPanel.css("flex-grow", "1").css("flex-basis", "0");
@@ -263,7 +268,7 @@
       $(`.inspections .inspection.selected`).removeClass("selected");
       $(`.inspections .inspection[data-ins-oid='${oid}']`).addClass("selected");
 
-      view.updatePanels();
+      view._updatePanels();
     }
 
     closeTab(oid, $evt)
@@ -385,6 +390,7 @@
           view.splitState.leftPanelWidth += $evt.by.x;
           view.inspection.splitState={leftPanelWidth:  view.splitState.leftPanelWidth};
         }
+        view.updatePanels();
       }
     }
 
@@ -536,7 +542,6 @@
         set.descr=view.editset.descr;
       }
       else view.ws.sets.push({oid: zn.shortid(), name: view.editset.name, descr: view.editset.descr, inspections: []});
-      console.log(view.ws.sets);
       view.apply();
       view.saveWS();
     }
@@ -818,19 +823,97 @@
       else $set.attr("data-state", "expanded");
     }
 
-    send($event)
+    async send($event)
     {
       let view=this;
       view.savePanels();
       view.saveWS();
 
-      let inspection=zn.utils.copyObj(view.inspection);
-      view.socket.emit("/apii/send", inspection);
+      let inspection=zn.utils.copyObj({
+        oid: view.inspection.oid,
+        target: view.inspection.target,
+        request: view.inspection.request,
+        response: view.inspection.response
+      });
+      let headers=inspection.request.headers.filter((item)=>item.header);
+      inspection.request.headers=headers;
+      view.sendTime=null;
+      
+      if(view.config.proxy) view.socket.emit("/apii/send", inspection);
+      else
+      {
+        let receivedInspection=await apii.Send.exec(inspection);
+        view.onReceive(receivedInspection);
+      }
+    }
+
+    contentMode(headers)
+    {
+      let contentType="application/json";
+      headers.forEach((item)=>{if(item.header=='content-type') contentType=item.value});
+
+      if(contentType.indexOf("application/json")==0) return "application/ld+json";
+      if(contentType.indexOf("text/html")==0) return "xml";
+      if(contentType.indexOf("text/xml")==0) return "xml";
+      return "application/ld+json";
+    }
+
+    formatResponse(inspection)
+    {
+      let headers=inspection.response.headers;
+      let content=inspection.response.content;
+      let status=inspection.response.status;
+
+      let headersMap=headers.reduce((a,c)=>
+      {
+        a[c.header]=c.value;
+        return a;
+      },{});
+      headers.unshift({header: "status", value: `${status.code} ${status.text}`});
+      inspection.response.isError=(status.code<200 || status.code >299);
+
+
+      if(headersMap["content-type"].indexOf("application/json")==0)
+      {
+        inspection.response.content=JSON.stringify(JSON.parse(content), null, 4);
+      }
+
+      if(headersMap["content-type"].indexOf("text/html")==0)
+      {
+        let options={
+          "indent_size": "4",
+          "indent_char": " ",
+          "max_preserve_newlines": "-1",
+          "preserve_newlines": false,
+          "keep_array_indentation": false,
+          "break_chained_methods": false,
+          "indent_scripts": "normal",
+          "brace_style": "collapse",
+          "space_before_conditional": true,
+          "unescape_strings": false,
+          "jslint_happy": false,
+          "end_with_newline": false,
+          "wrap_line_length": "0",
+          "indent_inner_html": false,
+          "comma_first": false,
+          "e4x": true,
+          "indent_empty_lines": false
+        }
+        inspection.response.content=html_beautify(content, options);
+      }
+
     }
 
     onReceive(inspection)
     {
-      console.info(inspection);
+      let view=this;
+      view.formatResponse(inspection);
+      view.inspection.response=inspection.response;
+      if(inspection.response.time) view.sendTime=Math.round(inspection.response.time * 1000 + 0.5)/1000;
+
+      view.apply();
+      view.updatePanels();
+      view._saveWS();
     }
 
     showAppMenu($evt)

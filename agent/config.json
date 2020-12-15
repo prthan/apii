@@ -1,7 +1,7 @@
 {
   "mode"           : "development",
   "name"           : "APIi Agent",
-  "id"             : "apii-agemt",
+  "id"             : "apii-agent",
   "home"           : "e:/workspaces/apii/dist",
 
   "logger"         :
@@ -13,7 +13,7 @@
   "listener":
   {
     "address"    : "0.0.0.0",
-    "port"       : 81
+    "port"       : 8181
   },
 
   "context": "/apii/agent",

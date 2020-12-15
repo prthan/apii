@@ -330,6 +330,10 @@
 }
 .panel-section .panel-section-action:hover {color: #607d8b;}
 
+.service-res.error .panel-tab {border-color: #ff6060}
+.service-res.error .panel-tab .label {background-color: #ff7a7a; color: #ffffff}
+
+
 .http-headers
 {
   border-bottom: 1px solid #dddddd;
@@ -385,6 +389,14 @@
 .service-res {width: 500px}*/
 .service-req .panel-body {border-right: 1px solid #e7e7e7;}
 .service-res .panel-body {border-left: 1px solid #e7e7e7;}
+
+.service-res .response-time 
+{
+  text-align: right;
+  font-size: 11px;
+  padding-right: 10px;
+  color: #989898
+}
 
 .panel-splitter
 {

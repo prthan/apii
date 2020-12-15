@@ -15,7 +15,10 @@
     "external/cm/addon/fold/xml-fold.js",
     "external/cm/mode/javascript/javascript.js",
     "external/cm/mode/xml/xml.js",
+    "external/cm/mode/css/css.js",
+    "external/cm/mode/htmlmixed/htmlmixed.js",
     "external/socket.io.js",
+    "external/beautify-html.js",
     "app/index.js"
   ],
 
@@ -51,10 +54,10 @@
     },
     "prod":
     {
-      "ctx": "/",
+      "ctx": "/apii",
       "api": "/api",
-      "res": "res",
-      "images": "res/images"
+      "res": "/apii/res",
+      "images": "/apii/res/images"
     }
 
   }

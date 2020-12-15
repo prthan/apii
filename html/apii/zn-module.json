@@ -4,7 +4,7 @@
   "title"        : "API Inspector",
   "template"     : "module/layout.html",
   "class"        : "apii.Module",
-  "script"       : "module/index.js",
+  "scripts"      : ["module/index.js", "module/send.js"],
   "style"        : "module/index.css",
   
   "includes":

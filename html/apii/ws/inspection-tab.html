@@ -33,9 +33,10 @@
     <div class="panel-splitter-filler"></div>
     <div class="panel-splitter-handle" zn-draggable tracker="true" ondragstart="view.panelSplit($event)" ondragmove="view.panelSplit($event)" ondragend="view.panelSplit($event)"></div>
   </div>
-  <div class="service-res fl-g1 fl fl-column">
-    <div class="panel-tab fl-g0">
-      <div class="label">Response</div>
+  <div class="service-res fl-g1 fl fl-column {{view.inspection.response.isError ? 'error': ''}}">
+    <div class="panel-tab fl-g0 fl">
+      <div class="label fl-g0">Response</div>
+      <div class="response-time fl-g1" ng-if="view.sendTime">{{view.sendTime}} ms</div>
     </div>
     <div class="panel-body fl-g1 fl fl-column">
       <div class="panel-section fl-g0 fl fl-ac">

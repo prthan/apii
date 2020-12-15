@@ -4,6 +4,9 @@ const utils=require('./utils');
 
 let send={};
 
+send.COLUMN_SIZE=80;
+send.TRUNCATE_SIZE=500;
+
 send.exec=(inspection)=>
 {
   let impl=async($res, $rej)=>
@@ -23,22 +26,34 @@ send.exec=(inspection)=>
       if(item.header && item.header!="") headers[item.header]=item.value;
     });
     options.headers=headers;
+    options.transformResponse=[];
     if(['PUT', 'POST', 'DELETE', 'PATCH'].includes(inspection.target.method)) options.data=inspection.request.content;
   
+    let outcome={startTime: process.hrtime()};
     axios(options)
     .then((res)=>
     {
-      send.copyRes(res, inspection);
-      send.logResponse(oid, inspection);
-      $res(inspection);
+      outcome.res=res;
+      //send.copyRes(res, inspection);
+      //send.logResponse(oid, inspection);
+      //$res(inspection);
     })
     .catch((err)=>
     {
-      if(err.response) send.copyRes(err.response, inspection)
-      else inspection.response.error=err.message;
+      if(err.response) outcome.res=err.response; //send.copyRes(err.response, inspection)
+      else outcome.err=err; //inspection.response.error=err.message;
+      //send.logResponse(oid, inspection);
+      //$res(inspection)
+    })
+    .finally(()=>
+    {
+      outcome.timeDiff=process.hrtime(outcome.startTime);
+      if(outcome.res) send.copyRes(outcome.res, inspection);
+      if(outcome.err) inspection.response.error=err.message;
+      inspection.response.time=outcome.timeDiff[0]*1000 + outcome.timeDiff[1] / 1000000;
       send.logResponse(oid, inspection);
-      $res(inspection)
-    });
+      $res(inspection);
+    })
   }
   return new Promise(impl);
 }
@@ -46,8 +61,7 @@ send.exec=(inspection)=>
 send.copyRes=(res, inspection)=>
 {
   inspection.response.status={code: res.status, text: res.statusText};
-  if(typeof(res.data)=="object") inspection.response.content=JSON.stringify(res.data);
-  else inspection.response.content=res.data;
+  inspection.response.content=res.data;
 
   inspection.response.headers=[];
   Object.keys(res.headers).forEach((header)=>inspection.response.headers.push({header: header, value: res.headers[header]}));
@@ -57,40 +71,53 @@ send.logRequest=(oid, inspection)=>
 {
   logger.info(`[${oid}]`, `inspection : ${inspection.oid}`);
   logger.info(`[${oid}]`, `┌───[ Request ]────────────────────────────────────────────────────────────────────┐`);
-  utils.wrapText(`${inspection.target.method} ${inspection.target.endpoint}`, 80, 200).forEach((line)=>logger.info(`[${oid}]`, '│', line,'│'));
+  utils.wrapText(`${inspection.target.method} ${inspection.target.endpoint}`, send.COLUMN_SIZE, send.TRUNCATE_SIZE).forEach((line)=>logger.info(`[${oid}]`, '│', line,'│'));
+  
   if(inspection.request.headers.length>0)
   {
     logger.info(`[${oid}]`, `├──────────────────────┬───────────────────────────────────────────────────────────┤`); 
     send.logHeaders(oid, inspection.request.headers);
     logger.info(`[${oid}]`, `├──────────────────────┴───────────────────────────────────────────────────────────┤`);  
   }
+
   if(inspection.target.method!="GET")
   {
     if(inspection.request.headers.length==0)
       logger.info(`[${oid}]`, `├──────────────────────────────────────────────────────────────────────────────────┤`); 
-    inspection.request.content.split("\n").forEach(line=>utils.wrapText(line, 80, 200).forEach((wline)=>logger.info(`[${oid}]`, '│', wline,'│')));
+    inspection.request.content.split("\n").forEach(line=>utils.wrapText(line, send.COLUMN_SIZE, send.TRUNCATE_SIZE).forEach((wline)=>logger.info(`[${oid}]`, '│', wline,'│')));
   }
+  
   logger.info(`[${oid}]`, `└──────────────────────────────────────────────────────────────────────────────────┘`);  
 }
 
 send.logResponse=(oid, inspection)=>
 {
   logger.info(`[${oid}]`, `┌───[ Response ]───────────────────────────────────────────────────────────────────┐`);
-  utils.wrapText(`${inspection.response.status.code} ${inspection.response.status.text}`, 80, 200).forEach(line=>logger.info(`[${oid}]`, '│', line,'│'));
+  utils.wrapText(`${inspection.response.status.code} ${inspection.response.status.text}`, send.COLUMN_SIZE, send.TRUNCATE_SIZE).forEach(line=>logger.info(`[${oid}]`, '│', line,'│'));
   if(inspection.response.headers.length>0)
   {
     logger.info(`[${oid}]`, `├──────────────────────┬───────────────────────────────────────────────────────────┤`);    
     send.logHeaders(oid, inspection.response.headers);
     logger.info(`[${oid}]`, `├──────────────────────┴───────────────────────────────────────────────────────────┤`);  
   }
+
   if(inspection.response.headers.length==0)
     logger.info(`[${oid}]`, `├──────────────────────────────────────────────────────────────────────────────────┤`); 
-  if(inspection.response.content)
-    inspection.response.content.split("\n").forEach(line=>utils.wrapText(line, 80, 200).forEach((wline)=>logger.info(`[${oid}]`, '│', wline,'│')));
-  if(inspection.response.error)
-    inspection.response.error.split("\n").forEach(line=>utils.wrapText(line, 80, 200).forEach((wline)=>logger.info(`[${oid}]`, '│', wline,'│')));
 
-    logger.info(`[${oid}]`, `└──────────────────────────────────────────────────────────────────────────────────┘`);  
+  if(inspection.response.content)
+  {
+    let content=inspection.response.content;
+    if(content.length>send.TRUNCATE_SIZE) content=content.substr(0, send.TRUNCATE_SIZE);
+    content.split("\n").forEach(line=>utils.wrapText(line, send.COLUMN_SIZE).forEach((wline)=>logger.info(`[${oid}]`, '│', wline,'│')));
+  }
+    
+  if(inspection.response.error)
+  {
+    let content=inspection.response.error;
+    if(content.length>send.TRUNCATE_SIZE) content=content.substr(0, send.TRUNCATE_SIZE);
+    content.split("\n").forEach(line=>utils.wrapText(line, send.COLUMN_SIZE).forEach((wline)=>logger.info(`[${oid}]`, '│', wline,'│')));
+  }
+  logger.info(`[${oid}]`, `└──────────────────────────────────────────────────────────────────────────────────┘`);  
 }
 
 send.logHeaders=(oid, headers)=>
@@ -107,7 +134,7 @@ send.logHeaders=(oid, headers)=>
     let lim=nameWrap.length > valueWrap.length ? nameWrap.length : valueWrap.length;
     for(let i=0;i<lim;i++)
     {
-      logger.info(`[${oid}]`, '│', i<nameWrap.length ? nameWrap[i]:"".padEnd(20), '│', i<valueWrap.length? valueWrap[i]:"".padEnd(20), '│');
+      logger.info(`[${oid}]`, '│', i<nameWrap.length ? nameWrap[i]:"".padEnd(20), '│', i<valueWrap.length? valueWrap[i]:"".padEnd(57), '│');
     }
   })
 }
