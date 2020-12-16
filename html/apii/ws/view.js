@@ -225,7 +225,6 @@
     {
       let view=this;
 
-      console.log('updating panels', view.inspection);
       view.editors.request.setValue(view.inspection.request.content);
       $(".service-req .panel-body").scrollTop(0);
 
@@ -938,6 +937,7 @@
       if(action=="import-ws") view.triggerImportWS($event);
       if(action=="export-ws") view.exportWS($event);
       if(action=="show-config") view.showConfigDialog();
+      if(action=="agent-download") view.downloadAgent();
     }
 
     showSelectWSDialog()
@@ -970,6 +970,11 @@
       zn.ui.components.Dialog.get("config-dialog").hide();      
       view.config={...view.editconfig};
       view.saveConfig();
+    }
+
+    downloadAgent()
+    {
+      window.location=zn.defn.data["agent-package"];
     }
   }
 

@@ -493,3 +493,6 @@
 .ws-list-dialog .zn-list .zn-list-item:last-of-type {border-bottom: none;}
 
 .download, .upload {display: none;}
+
+.agent-link {color: #bcbcbc; text-decoration: none;}
+.agent-link i {display: inline-block; padding-right: 5px;}

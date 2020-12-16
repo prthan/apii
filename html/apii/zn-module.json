@@ -55,7 +55,9 @@
         {"value": "basic", "label": "Basic"},
         {"value": "bearer", "label": "Bearer"}
       ]      
-    }
+    },
+
+    "agent-package": "https://github.com/prthan/apii/releases/download/v0.2-alpha/apii-agent.zip"
   }
 
 }
