@@ -872,12 +872,12 @@
       inspection.response.isError=(status.code<200 || status.code >299);
 
 
-      if(headersMap["content-type"].indexOf("application/json")==0)
+      if(headersMap["content-type"] && headersMap["content-type"].indexOf("application/json")==0)
       {
         inspection.response.content=JSON.stringify(JSON.parse(content), null, 4);
       }
 
-      if(headersMap["content-type"].indexOf("text/html")==0)
+      if(headersMap["content-type"] && headersMap["content-type"].indexOf("text/html")==0)
       {
         let options={
           "indent_size": "4",
@@ -976,6 +976,7 @@
     {
       window.location=zn.defn.data["agent-package"];
     }
+
   }
 
 

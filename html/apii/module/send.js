@@ -28,12 +28,11 @@
           {
             let headers=inspection.response.headers=[];
             headers.push();
-            let contentType="";
             for(let item of response.headers.entries())
             {
-              if(item[0]=='content-type') contentType=item[1];
               headers.push({header: item[0], value: item[1]});
             }
+            inspection.response.headers=headers;
             inspection.response.status={code: response.status, text: response.statusText}
             inspection.response.content=responseText;
             $res(inspection);

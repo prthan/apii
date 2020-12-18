@@ -19,6 +19,7 @@
     "external/cm/mode/htmlmixed/htmlmixed.js",
     "external/socket.io.js",
     "external/beautify-html.js",
+    "external/parser.js",
     "app/index.js"
   ],
 

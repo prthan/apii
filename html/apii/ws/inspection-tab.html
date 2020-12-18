@@ -18,8 +18,8 @@
       </div>
       <div class="http-headers fl-g0">
         <div class="http-header fl fl-ac" ng-repeat="item in view.inspection.request.headers" data-index="{{$index}}">
-          <div class="header-name fl-g0" zn-editable onedit="view.updateRequestHeader($index, 'header', $event)">{{item.header}}</div>
-          <div class="header-value fl-g1" zn-editable onedit="view.updateRequestHeader($index, 'value', $event)">{{item.value}}</div>
+          <div class="header-name fl-g0" zn-editable onedit="view.updateRequestHeader($index, 'header', $event)" tabindex="0">{{item.header}}</div>
+          <div class="header-value fl-g1" zn-editable onedit="view.updateRequestHeader($index, 'value', $event)" tabindex="0">{{item.value}}</div>
           <a title="Delete Header" class="header-action fl-g0" ng-click="view.deleteRequestHeader($index, $event)"><i class="far fa-trash-alt"></i></a>
         </div>
       </div>
