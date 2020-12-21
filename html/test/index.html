@@ -1,7 +1,7 @@
 <html>
 <body>
   <script src="../external/sax.js"></script>
-  <script src="../apii/module/xmljsdom.js"></script>
+  <script src="../apii/xml/utils.js"></script>
 
   <script>
     let data=`<?xml version="1.0" encoding="UTF-8"?>
@@ -424,7 +424,7 @@
         </service>
     </definitions>`;
     
-    let obj=apii.XMLJSDom.parse(data);
+    let obj=apii.xml.Utils.createJSDom(data);
     console.log(obj);
   </script>
 

@@ -1,11 +1,11 @@
 (function(window)
 {
   let __package = "apii";
-  let __name = "XMLJSDom";
+  let __name = "SOAPHelper";
 
   class Component
   {
-    static parse(data)
+    static parseXML(data)
     {
       let obj={};
       let tagsPath=[];
@@ -39,6 +39,9 @@
     {
       Object.keys(attrs).forEach((key)=>obj[`@${key}`]=attrs[key].value);
     }
+
+    static 
+    
   }
 
   __package.split(".").reduce((a, e) => a[e] = a[e] || {}, window)[__name] = Component;
