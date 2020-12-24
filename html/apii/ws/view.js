@@ -35,6 +35,8 @@
       view.loadConfig();
       view.loadWS();
       view.connectToAgent();
+
+      //view.test();
     }
     
     setupUI()
@@ -88,7 +90,12 @@
       let view=this;
       if(!view.config.proxy) return;
 
-      console.info("[APIi]", `connecting to agent at ${view.config.proxy}`)
+      let client=new apii.agent.Client({endpoint: view.config.proxy, oid: view.config.oid});
+      client.connect();
+      
+      view.client=client;
+
+      /*console.info("[APIi]", `connecting to agent at ${view.config.proxy}`)
       view.socket=io(`${view.config.proxy}`,{
         path: "/apii/agent",
         withCredentials: true
@@ -100,7 +107,7 @@
         view.socket.emit("/apii/announce", {oid: view.config.oid});
       })
       view.socket.on("/apii/announce/ack", (socmsg)=>console.info("[APIi]", `announcing acknowledged by agent`));
-      view.socket.on("/apii/receive", (socmsg)=>view.onReceive(socmsg));
+      view.socket.on("/apii/receive", (socmsg)=>view.onReceive(socmsg));*/
     }
 
     emptyWS()
@@ -838,7 +845,11 @@
       inspection.request.headers=headers;
       view.sendTime=null;
       
-      if(view.config.proxy) view.socket.emit("/apii/send", inspection);
+      if(view.config.proxy)
+      {
+        let receivedInspection=await view.client.send(inspection);
+        view.onReceive(receivedInspection);
+      }
       else
       {
         let receivedInspection=await apii.Send.exec(inspection);
@@ -977,6 +988,17 @@
       window.location=zn.defn.data["agent-package"];
     }
 
+
+    test()
+    {
+      window.__agentclient=new apii.agent.Client({endpoint: "http://localhost:8181", oid: "TEST"});
+      window.__agentclient.connect();
+  
+      apii.xml.Utils.fetch("https://www.crcind.com/csp/samples/SOAP.Demo.CLS?WSDL=1").then((doms)=>
+      {
+        console.log(doms);
+      });
+    }
   }
 
 

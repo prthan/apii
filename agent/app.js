@@ -3,6 +3,7 @@ const io=require('socket.io')(http);
 const fs=require('fs');
 const logger=require('./logger');
 const send=require('./send');
+const fetch=require('./fetch');
 
 let app={};
 
@@ -45,6 +46,7 @@ io.on("connection", (socket)=>
 
   socket.on("/apii/announce", (socmsg)=>app.onAnnounce(socket, socmsg));
   socket.on("/apii/send", (socmsg)=>app.onSend(socket, socmsg));
+  socket.on("/apii/fetch", (socmsg)=>app.onFetch(socket, socmsg));
   socket.on("disconnect",()=>app.onDisconnect(socid))
 })
 
@@ -60,10 +62,17 @@ app.onSend=async(socket, socmsg)=>
   socket.emit("/apii/receive", inspection);
 }
 
+app.onFetch=async(socket, socmsg)=>
+{
+  let outcome=await fetch.exec(socmsg);
+  socket.emit("/apii/fetch", outcome);
+}
+
 app.onDisconnect=(socid)=>
 {
   logger.info(`client ${socid} disconnected`);
   delete app["@sockets"][socid];
 }
 
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
 app.start();

@@ -5,44 +5,72 @@
 
   class Component
   {
-    static createJSDom(data)
+    static fetchDoc(url, type, agentClient)
     {
-      let obj={};
-      let tagsPath=[];
-
-      let saxparser=sax.parser(true, {xmlns: true, trim: true});
-      saxparser.onerror=(e)=>console.log(e);
-      saxparser.onopentag=(node)=>
+      let doms=[];
+      let list=[{location: url, type: type || "wsdl"}];
+      let impl=async($res, $rej)=>
       {
-        let tag={};
-        Component.setAttributes(tag, node.attributes);
-        let tagName=`${node.prefix ? node.prefix +':' : ''}${node.local}`;
-        if(!obj[tagName]) obj[tagName]=tag;
-        else 
+        while(list.length>0)
         {
-          let _tag=obj[tagName];
-          if(_tag instanceof Array) _tag.push(tag);
-          else obj[tagName]=[obj[tagName], tag];
+          let {location, type}=list.shift();
+          console.log('fetching', type, location);
+          let fetchOutcome=await agentClient.fetch(location);
+          if(fetchOutcome.res.error)
+          {
+            console.info("An error occured while loading the doc at ", location)
+            console.error(fetchOutcome.res.error);
+            $rej(fetchOutcome.error);
+            return;
+          }
+          if(fetchOutcome.res.status.code!=200)
+          {
+            console.info("An error occured while loading the doc at ", location);
+            console.error(fetchOutcome.res.status);
+            $rej(fetchOutcome.res.status);
+            return;
+          }
+          let dom=new apii.xml.JSDom(fetchOutcome.res.content);
+          doms.unshift({dom: dom, type: type});
+
+          if(type=="wsdl" && dom.doc.definitions.import) 
+          {
+            Component.array(dom.import).forEach((importTag)=>
+            {
+              if(importTag.$ns=='http://schemas.xmlsoap.org/wsdl/')
+              {
+                list.push({location: new URL(importTag["@location"], location).toString(), type: "wsdl"});
+              }
+            });
+          }
+
+          if(type=="wsdl" && dom.doc.definitions.types && dom.doc.definitions.types.schema)
+          {
+            Component.array(dom.doc.definitions.types.schema).forEach((schema)=>
+            {
+              Component.array(schema.import).forEach((importTag)=>
+              {
+                list.push({location: new URL(importTag["@schemaLocation"], location).toString(), type: "xsd"});
+              })
+            })
+          }
+
+          if(type=="xsd" && dom.doc.schema.import)
+          {
+            Component.array(dom.doc.schema.import).forEach((importTag)=>
+            {
+              list.push({location: new URL(importTag["@schemaLocation"], location).toString(), type: "xsd"});
+            })
+          }
         }
-        tagsPath.push(obj);
-        obj=tag;
+        $res(doms);
       }
-      saxparser.onclosetag=()=>
-      {
-        obj=tagsPath.pop();
-      }
-      saxparser.write(data).close();
-      return obj;
+      return new Promise(impl);
     }
 
-    static setAttributes(obj, attrs)
+    static array(a)
     {
-      Object.keys(attrs).forEach((key)=>obj[`@${key}`]=attrs[key].value);
-    }
-
-    static fetchWSDL(url)
-    {
-      
+      return a instanceof Array ? a : [a];
     }
     
   }

@@ -6,6 +6,7 @@
     <link rel="stylesheet" type="text/css" href="../app.css"/>
     <link rel="stylesheet" type="text/css" href="module/index.css"/>
     <link rel="stylesheet" type="text/css" href="ws/view.css"/>
+    <link rel="stylesheet" type="text/css" href="soap/view.css"/>
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -15,9 +16,15 @@
     <script src="../app.js"></script>
     <script src="module/index.js"></script>
     <script src="module/send.js"></script>
+    <script src="module/agent-client.js"></script>
+    <script src="xml/jsdom.js"></script>
+    <script src="xml/utils.js"></script>
+    <script src="xml/wsdl.js"></script>
+    <script src="xml/xsd.js"></script>
     <script src="ws/view.js"></script>
+    <script src="soap/view.js"></script>
 
-    <script>zn.env={"ctx":"/","api":"/api","res":"/res","images":"/res/images"};zn.defn={"routes":{"/ws":{"view":"ws","default":true},"/ws/@id":{"view":"ws"}},"views":{"ws":{"class":"apii.view.Workspace","template":"ws/view.html"}},"name":"apii","class":"apii.Module","title":"API Inspector","template":"module/layout.html","data":{"lovs":{"httpMethods":[{"value":"GET","label":"GET"},{"value":"PUT","label":"PUT"},{"value":"POST","label":"POST"},{"value":"DELETE","label":"DELETE"},{"value":"PATCH","label":"PATCH"},{"value":"OPTIONS","label":"OPTIONS"}],"authHeaderType":[{"value":"basic","label":"Basic"},{"value":"bearer","label":"Bearer"}]},"agent-package":"https://github.com/prthan/apii/releases/download/v0.2-alpha/apii-agent.zip"}};</script>
+    <script>zn.env={"ctx":"/","api":"/api","res":"/res","images":"/res/images"};zn.defn={"routes":{"/ws":{"view":"ws","default":true},"/ws/@id":{"view":"ws"},"/soap":{"view":"soap"}},"views":{"ws":{"class":"apii.view.Workspace","template":"ws/view.html"},"soap":{"class":"apii.view.Soap","template":"soap/view.html"}},"name":"apii","class":"apii.Module","title":"API Inspector","template":"module/layout.html","data":{"lovs":{"httpMethods":[{"value":"GET","label":"GET"},{"value":"PUT","label":"PUT"},{"value":"POST","label":"POST"},{"value":"DELETE","label":"DELETE"},{"value":"PATCH","label":"PATCH"},{"value":"OPTIONS","label":"OPTIONS"}],"authHeaderType":[{"value":"basic","label":"Basic"},{"value":"bearer","label":"Bearer"}]},"agent-package":"https://github.com/prthan/apii/releases/download/v0.2-alpha/apii-agent.zip"}};</script>
 
     <div class="zn-module"></div>
   </body>

@@ -1562,4 +1562,6 @@
       }
     }())
   }
-})(typeof exports === 'undefined' ? this.sax = {} : exports)
+})(typeof exports === 'undefined' ? this.sax = {} : exports);
+
+

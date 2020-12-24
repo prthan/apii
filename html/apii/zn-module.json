@@ -4,7 +4,7 @@
   "title"        : "API Inspector",
   "template"     : "module/layout.html",
   "class"        : "apii.Module",
-  "scripts"      : ["module/index.js", "module/send.js"],
+  "scripts"      : ["module/index.js", "module/send.js", "module/agent-client.js", "xml/jsdom.js", "xml/utils.js", "xml/wsdl.js", "xml/xsd.js"],
   "style"        : "module/index.css",
   
   "includes":
@@ -21,13 +21,21 @@
       "template" : "ws/view.html",
       "script"   : "ws/view.js",
       "style"    : "ws/view.css"
+    },
+    "soap":
+    {
+      "class"    : "apii.view.Soap",
+      "template" : "soap/view.html",
+      "script"   : "soap/view.js",
+      "style"    : "soap/view.css"
     }
   },
 
   "routes":
   {
     "/ws"     : {"view": "ws", "default": true},
-    "/ws/@id" : {"view": "ws"}
+    "/ws/@id" : {"view": "ws"},
+    "/soap"   : {"view": "soap"}
   },
 
   "fragments":

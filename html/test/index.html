@@ -1,7 +1,10 @@
 <html>
 <body>
+  <script src="../app.js"></script>    
   <script src="../external/sax.js"></script>
+  <script src="../apii/module/agent-client.js"></script>
   <script src="../apii/xml/utils.js"></script>
+  <script src="../apii/xml/jsdom.js"></script>
 
   <script>
     let data=`<?xml version="1.0" encoding="UTF-8"?>
@@ -424,8 +427,15 @@
         </service>
     </definitions>`;
     
-    let obj=apii.xml.Utils.createJSDom(data);
-    console.log(obj);
+
+    window.__agentclient=new apii.agent.Client({endpoint: "http://localhost:8181", oid: "TEST"});
+    window.__agentclient.connect();
+
+    apii.xml.Utils.fetch("https://www.crcind.com/csp/samples/SOAP.Demo.CLS?WSDL=1").then((doms)=>
+    {
+      console.log(doms);
+    });
+    
   </script>
 
 </body>

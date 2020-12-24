@@ -20,6 +20,7 @@
     "external/socket.io.js",
     "external/beautify-html.js",
     "external/parser.js",
+    "external/sax.js",
     "app/index.js"
   ],
 
