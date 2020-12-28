@@ -3,7 +3,7 @@
   let __package = "apii.xml";
   let __name = "Utils";
 
-  class Component
+  class Utils
   {
     static fetchDoc(url, type, agentClient)
     {
@@ -35,7 +35,7 @@
 
           if(type=="wsdl" && dom.doc.definitions.import) 
           {
-            Component.array(dom.import).forEach((importTag)=>
+            Utils.array(dom.import).forEach((importTag)=>
             {
               if(importTag.$ns=='http://schemas.xmlsoap.org/wsdl/')
               {
@@ -46,9 +46,9 @@
 
           if(type=="wsdl" && dom.doc.definitions.types && dom.doc.definitions.types.schema)
           {
-            Component.array(dom.doc.definitions.types.schema).forEach((schema)=>
+            Utils.array(dom.doc.definitions.types.schema).forEach((schema)=>
             {
-              Component.array(schema.import).forEach((importTag)=>
+              Utils.array(schema.import).forEach((importTag)=>
               {
                 list.push({location: new URL(importTag["@schemaLocation"], location).toString(), type: "xsd"});
               })
@@ -57,7 +57,7 @@
 
           if(type=="xsd" && dom.doc.schema.import)
           {
-            Component.array(dom.doc.schema.import).forEach((importTag)=>
+            Utils.array(dom.doc.schema.import).forEach((importTag)=>
             {
               list.push({location: new URL(importTag["@schemaLocation"], location).toString(), type: "xsd"});
             })
@@ -72,10 +72,9 @@
     {
       return a instanceof Array ? a : [a];
     }
-    
   }
 
-  __package.split(".").reduce((a, e) => a[e] = a[e] || {}, window)[__name] = Component;
+  __package.split(".").reduce((a, e) => a[e] = a[e] || {}, window)[__name] = Utils;
 
 })(window);
 

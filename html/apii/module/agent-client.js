@@ -76,7 +76,7 @@
       {
         let $res=client.$$[oid];
         delete client.$$[oid];
-        $res(socmsg);
+        $res(socmsg.res);
       }
     }
   }

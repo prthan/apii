@@ -9,52 +9,52 @@
     {
       super(data);
 
-      this.wsdlImports=[];
-      this.schemaImports=[];
+      this.imports=[];
+      this.types=null;
     }
 
-    fetch(location)
+    fetch(location, options)
     {
       let wsdl=this;
       let impl=async($res, $rej)=>
       {
         console.info(`fetching wsdl ==> ${location}`);
-        let fetchOutcome=await wsdl.client.fetch(location);
-        if(fetchOutcome.res.error)
+        let urlres=await wsdl.getURL(location, options);
+        if(urlres.error)
         {
-          $rej(new Error(`An error occured while loading the doc at ${location}. Error: ${fetchOutcome.res.error}`));
+          $rej(new Error(`An error occured while loading the doc at ${location}. Error: ${urlres.error}`));
           return;
         }
-        if(fetchOutcome.res.status.code!=200)
+        if(urlres.status.code!=200)
         {
-          $rej(new Error(`An error occured while loading the doc at ${location}. Status: ${fetchOutcome.res.status.code}, ${fetchOutcome.res.status.text}`));
+          $rej(new Error(`An error occured while loading the doc at ${location}. Status: ${urlres.status.code}, ${urlres.status.text}`));
           return;
         }
-        wsdl.parse(fetchOutcome.res.content);
+        wsdl.parse(urlres.content);
+
+        if(!wsdl.doc.definitions)
+        {
+          $res();
+          return;
+        }
 
         if(wsdl.doc.definitions.import) 
         {
           for(let importTag of wsdl.array(wsdl.doc.definitions.import))
           {
             let importedWSDL=new apii.xml.WSDL();
-            importedWSDL.client=wsdl.client;
             await importedWSDL.fetch(new URL(importTag["@location"], location).toString())
-            wsdl.wsdlImports.push(importedWSDL);
+            wsdl.imports.push(importedWSDL);
           };
         }
 
-        if(wsdl.doc.definitions.types && wsdl.doc.definitions.types.schema)
+        let types=wsdl.doc.definitions.types || wsdl.imports.find(w=>w.doc.definitions.types);
+        if(types && types.schema)
         {
-          for(let schema of wsdl.array(wsdl.doc.definitions.types.schema))
-          {
-            for(let importTag of wsdl.array(schema.import))
-            {
-              let importedSchema=new apii.xml.XSD();
-              importedSchema.client=wsdl.client;
-              await importedSchema.fetch(new URL(importTag["@schemaLocation"], location).toString());
-              wsdl.schemaImports.push(importedSchema);
-            };
-          };
+          let nsmap=Object.keys(wsdl.ns).reduce((a,c)=>{a[wsdl.ns[c]]=c; return a}, {});
+          let schemaXML=wsdl.generateNode(types.schema, "schema", 0, nsmap);
+          wsdl.types=new apii.xml.XSD(schemaXML);
+          await wsdl.types.fetchImports(options);
         }
 
         $res();
