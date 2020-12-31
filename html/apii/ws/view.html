@@ -47,10 +47,50 @@
 </div>
 
 
+<div zn-dialog name="wsdl-load-dialog" dialogtitle="WSDL" actions="view.dialogActions['WSDL-LOAD']" onaction="view.onWSDLLoadDialogAction($event)" class="wsdl-load-dialog">
+  <div class="wsdl-form fl fl-column">
+    <form autocomplete="off">
+      <div class="fl">
+        <div zn-textfield class="fl-g1" name="wsdl-url" label="URL" value="view.loadwsdl.url"></div>
+        <div class="load-wsdl-btn-wrapper fl-g0">
+          <div zn-button class="load-wsdl-url-action" text="Load WSDL" action="'load-wsdl'" onaction="view.loadWSDL($event)"></div>
+        </div>
+      </div>
+    </form>
+    <div zn-dropdownfield class="fl-g0" name="port-types" label="Port Types" value="view.wsdlData.selectedPortType" items="view.wsdlData.portTypes" ng-if="view.wsdlData.portTypes.length>0" onchange="view.onWSDLPortTypeChange($event)"></div>
+    <div class="operations fl-g0" ng-if="view.wsdlData.portTypes.length>0">
+      <div class="fl">
+        <div class="label fl-g1">Operations</div>
+        <div class="select-all-operations check-box fl-g0" data-state="on">
+          <i class="state-off far fa-square"></i><i class="state-on fas fa-check-square"></i>
+        </div>
+      </div>
+      <div class="operations-list lean-scroll">
+        <div class="operation fl fl-ac" ng-repeat="operation in view.wsdlData.portTypeOperations[view.wsdlData.selectedPortType]">
+          <div class="oper-name fl-g1">{{operation["@name"]}}</div>
+          <div class="check-box" data-state="on" data-oper-name="{{operation['@name']}}">
+            <i class="state-off far fa-square"></i><i class="state-on fas fa-check-square"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div zn-textfield class="fl-g0" name="set-name" label="Set Name" value="view.loadwsdl.setName" error="view.editws.error.name" ng-if="view.wsdlData.portTypes.length>0"></div>
+    <div zn-textarea class="fl-g1" name="set-descr" label="Description" value="view.loadwsdl.setDescr" ng-if="view.wsdlData.portTypes.length>0"></div>
+    <div class="status-message" ng-if="view.loadwsdl.msg!=''">{{view.loadwsdl.msg}}</div>
+  </div>
+</div>
+
 <div zn-popup name="tab-menu" class="popup-menu-items tab-menu">
   <a class="popup-menu-item" ng-click="view.onTabMenuAction('edit')"><i class="fas fa-pencil-alt"></i><span class="popup-menu-item-text">Edit</span></a>
   <a class="popup-menu-item" ng-click="view.onTabMenuAction('delete')"><i class="fas fa-trash"></i><span class="popup-menu-item-text">Delete</span></a>
   <a class="popup-menu-item" ng-click="view.onTabMenuAction('duplicate')"><i class="fas fa-clone"></i><span class="popup-menu-item-text">Duplicate</span></a>
+</div>
+
+<div zn-popup name="ws-menu" class="popup-menu-items ws-menu">
+  <a class="popup-menu-item" ng-click="view.onWSMenuAction('edit')"><i class="fas fa-pencil-alt"></i><span class="popup-menu-item-text">Edit Workspace</span></a>
+  <a class="popup-menu-item" ng-click="view.onWSMenuAction('delete')"><i class="fas fa-trash"></i><span class="popup-menu-item-text">Delete Workspace</span></a>
+  <a class="popup-menu-item" ng-click="view.onWSMenuAction('add-set')"><i class="fas fa-folder-plus"></i><span class="popup-menu-item-text">Add Set</span></a>
+  <a class="popup-menu-item" ng-click="view.onWSMenuAction('add-wsdl')"><i class="fas fa-folder-plus"></i><span class="popup-menu-item-text">Add WSDL</span></a>
 </div>
 
 <div zn-popup name="app-menu" class="popup-menu-items app-menu" source=".app-action" showat="bottom">

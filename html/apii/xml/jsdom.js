@@ -57,6 +57,7 @@
 
     array(a)
     {
+      if(a==null) return [];
       return a instanceof Array ? a : [a];
     }
 
@@ -94,7 +95,7 @@
         if(level==0 && nsmap) nsvals=Object.keys(nsmap).reduce((a,c)=>a+=` xmlns:${nsmap[c]}="${c}"`, "");
 
 
-        if(node.$value) tags.push(`${spaces}<${prefix}${name}${ns}${nsvals}${dom.attrs(node)}>${node.$value}</${prefix}${name}>`);
+        if(node.$value || node.$value=="") tags.push(`${spaces}<${prefix}${name}${ns}${nsvals}${dom.attrs(node)}>${node.$value}</${prefix}${name}>`);
         else
         {
           let openTag=`${spaces}<${prefix}${name}${ns}${nsvals}${dom.attrs(node)}`;
@@ -116,6 +117,7 @@
     
     attrs(obj)
     {
+      //console.log(obj);
       let attrsText=Object.keys(obj).filter(x=>x.indexOf("@")==0).reduce((a, c)=>a+=` ${c.substring(1)}="${obj[c]}"`, "");
       return attrsText;
     }

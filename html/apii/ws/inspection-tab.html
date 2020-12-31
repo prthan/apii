@@ -12,7 +12,7 @@
       <div class="panel-section fl-g0 fl fl-ac">
         <div class="panel-section-label fl-g1">Headers</div>
         <div class="panel-section-actions fl-g0 fl fl-ac">
-          <a class="panel-section-action fl-g0" title="Add Authorization Header"><i class="far fa-address-card"></i></a>
+          <!--a class="panel-section-action fl-g0" title="Add Authorization Header"><i class="far fa-address-card"></i></a-->
           <a class="panel-section-action fl-g0" title="Add Header" ng-click="view.addRequestHeader($event)"><i class="fas fa-plus-circle"></i></a>
         </div>
       </div>
@@ -36,7 +36,7 @@
   <div class="service-res fl-g1 fl fl-column {{view.inspection.response.isError ? 'error': ''}}">
     <div class="panel-tab fl-g0 fl">
       <div class="label fl-g0">Response</div>
-      <div class="response-time fl-g1" ng-if="view.sendTime">{{view.sendTime}} ms</div>
+      <div class="response-time fl-g1" ng-if="view.inspection.response.time">{{view.inspection.response.time}} ms</div>
     </div>
     <div class="panel-body fl-g1 fl fl-column">
       <div class="panel-section fl-g0 fl fl-ac">

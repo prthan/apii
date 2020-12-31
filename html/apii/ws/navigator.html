@@ -5,11 +5,13 @@
 
 <div class="ws-header fl-g0">
   <div class="item-actions">
-    <a title="Edit Workspace" class="item-action"><i class="fas fa-pencil-alt" ng-click="view.showEditWSDialog('edit')"></i></a>
+    <a title="Workspace Menu" class="item-action" ng-click="view.showWSMenu($event)"><i class="fas fa-caret-square-down"></i></a>
+    <!--a title="Edit Workspace" class="item-action"><i class="fas fa-pencil-alt" ng-click="view.showEditWSDialog('edit')"></i></a>
     <a title="Delete Workspace" class="item-action"><i class="fas fa-trash" ng-click="view.deleteWorkspace()"></i></a>
-    <a title="Add Set" class="item-action add-set" ng-click="view.showEditSetDialog('new', null, $event)"><i class="fas fa-folder-plus"></i></a>
+    <a title="Add Set" class="item-action add-set" ng-click="view.showEditSetDialog('new', null, $event)"><i class="fas fa-folder-plus"></i></a-->
   </div>
-  <div class="ws-name">{{view.ws.name}}</div>
+
+  <div class="ws-name fl-g1">{{view.ws.name}}</div>
   <div class="ws-descr">{{view.ws.descr}}</div>
 </div>
 
@@ -30,9 +32,12 @@
     <div class="inspections">
       <div class="inspection fl fl-ac" ng-repeat="oid in set.inspections" data-ins-oid="{{oid}}" data-index="{{$index}}"
       data-state="{{view.ws.inspections[oid].state}}" ng-click="view.showInspection(oid, $event)">
-        <div class="icon fl-g0"><i class="fas fa-paper-plane"></i></div>
+        <!--div class="icon fl-g0"><i class="fas fa-rss"></i></div-->
+        <div class="icon fl-g0">
+          <img ng-src="{{env.images}}/icons/xml.svg"/>
+        </div>
         <div class="state-indicator fl-g0"><span><i class="fas fa-circle"></i></span></div>        
-        <div class="text fl-g1">{{view.ws.inspections[oid].name}}</div>
+        <div class="text fl-g1" title="{{view.ws.inspections[oid].name}}">{{view.ws.inspections[oid].name}}</div>
         <div class="item-actions fl-g0">
           <a title="Edit Inspection" class="item-action"><i class="fas fa-pencil-alt" ng-click="view.showEditInspectionDialog('edit', oid, set.oid, $event)"></i></a>
           <a title="Delete Inspection" class="item-action" ng-click="view.deleteSetInspection($parent.$index, $index, $event)"><i class="fas fa-trash"></i></a>
@@ -40,16 +45,19 @@
       </div>
     </div>
   </div>
-  <div class="set-buffer" ng-if="view.ws.sets.length>0 && view.ws.untitled.length>0">&nbsp;</div>
-  <div class="set untitled" data-state="expanded" data-set-oid="{{'untitled-set'}}">
-    <!--div class="set-name fl fl-ac" ng-click="view.toggleSet('untitled-set', $event)">
+  <!--div class="set-buffer" ng-if="view.ws.sets.length>0 && view.ws.untitled.length>0">&nbsp;</div-->
+  <div class="set untitled" data-state="expanded" data-set-oid="{{'untitled-set'}}" ng-show="view.ws.untitled.length>0">
+    <div class="set-name fl fl-ac" ng-click="view.toggleSet('untitled-set', $event)">
       <div class="icon fl-g0"><i class="expanded fas fa-caret-down"></i><i class="collapsed fas fa-caret-right"></i></div>
-      <div class="text fl-g1">{Uncategorized}</div>
-    </div-->
+      <div class="text fl-g1">Inspections</div>
+    </div>
     <div class="inspections">
       <div class="inspection fl fl-ac" ng-repeat="oid in view.ws.untitled" data-ins-oid="{{oid}}" data-index="{{$index}}"
       data-state="{{view.ws.inspections[oid].state}}" ng-click="view.showInspection(oid, $event)">
-        <div class="icon fl-g0"><i class="fas fa-paper-plane"></i></div>
+        <!--div class="icon fl-g0"><i class="fas fa-rss"></i></div-->
+        <div class="icon fl-g0">
+          <img ng-src="{{env.images}}/icons/xml.svg"/>
+        </div>
         <div class="state-indicator fl-g0"><span><i class="fas fa-circle"></i></span></div>        
         <div class="text fl-g1">{{view.ws.inspections[oid].name}}</div>
         <div class="item-actions fl-g0">

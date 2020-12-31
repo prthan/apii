@@ -21,6 +21,7 @@
         options.credentials="include";
         options.mode="cors";
     
+        let startTime=performance.now();
         fetch(inspection.target.endpoint, options)
         .then((response)=>
         {
@@ -35,6 +36,8 @@
             inspection.response.headers=headers;
             inspection.response.status={code: response.status, text: response.statusText}
             inspection.response.content=responseText;
+            inspection.response.time=performance.now()-startTime;
+            inspection.response.time=Math.round((performance.now()-startTime)*1000+0.5)/1000;
             $res(inspection);
           });
         })
@@ -43,6 +46,7 @@
           inspection.response.headers=[];
           inspections.response.status={code: -1, text: "error sending the request"}
           inspection.response.content=JSON.stringify(ex);
+          inspection.response.time=Math.round((performance.now()-startTime)*1000+0.5)/1000;
           $res(inspection);
         })
       }

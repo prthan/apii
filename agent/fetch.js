@@ -34,13 +34,17 @@ fetch.exec=(req)=>
       if(outcome.res)
       {
         logger.info(`[${oid}]`, `        status: ${outcome.res.status}, ${outcome.res.statusText}`);
-        res.status={code: outcome.res.status, text: outcome.res.statusText};
-        res.content=outcome.res.data;
+        if(outcome.res.status==200)
+        {
+          res.status={code: outcome.res.status, text: outcome.res.statusText};
+          res.content=outcome.res.data;
+        }
+        else res.error={code: outcome.res.status, message: outcome.res.statusText, details: outcome.res.data};
       }
       if(outcome.err)
       {
         logger.info(`[${oid}]`, `        error: ${outcome.err.message}`);
-        res.error=outcome.err.message;
+        res.error={code: -1, message: outcome.err.message};
       }
       $res({res: res, "@agentReqId": req["@agentReqId"]});
     })

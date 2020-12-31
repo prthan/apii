@@ -51,6 +51,7 @@ send.exec=(inspection)=>
       if(outcome.res) send.copyRes(outcome.res, inspection);
       if(outcome.err) inspection.response.error=err.message;
       inspection.response.time=outcome.timeDiff[0]*1000 + outcome.timeDiff[1] / 1000000;
+      inspection.response.time=Math.round(inspection.response.time*1000+0.5)/1000;
       send.logResponse(oid, inspection);
       $res(inspection);
     })
@@ -106,14 +107,14 @@ send.logResponse=(oid, inspection)=>
 
   if(inspection.response.content)
   {
-    let content=inspection.response.content;
+    let content=inspection.response.content.replace(/\r/g, "");
     if(content.length>send.TRUNCATE_SIZE) content=content.substr(0, send.TRUNCATE_SIZE);
     content.split("\n").forEach(line=>utils.wrapText(line, send.COLUMN_SIZE).forEach((wline)=>logger.info(`[${oid}]`, '│', wline,'│')));
   }
     
   if(inspection.response.error)
   {
-    let content=inspection.response.error;
+    let content=inspection.response.error.replace(/\r/g, "");
     if(content.length>send.TRUNCATE_SIZE) content=content.substr(0, send.TRUNCATE_SIZE);
     content.split("\n").forEach(line=>utils.wrapText(line, send.COLUMN_SIZE).forEach((wline)=>logger.info(`[${oid}]`, '│', wline,'│')));
   }

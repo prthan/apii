@@ -15,7 +15,11 @@
           {action: "ok", label: "OK", autohide: false}, 
           {action: "cancel", label: "Cancel"}, 
         ],
-        "CANCEL": [{action: "cancel", label: "Cancel"}]
+        "CANCEL": [{action: "cancel", label: "Cancel"}],
+        "WSDL-LOAD":
+        [
+          {action: "cancel", label: "Cancel"}
+        ]
       };
       
       this.ws=this.emptyWS();
@@ -25,6 +29,13 @@
       this.tabs=[this.inspection.oid];
       this.sets=[];
       this.config={};
+      this.wsdlData=
+      {
+        portTypes: [],
+        portTypeOperations: {},
+        selectedPortType: ""
+      }
+
     }
 
     init()
@@ -35,8 +46,6 @@
       view.loadConfig();
       view.loadWS();
       view.connectToAgent();
-
-      //view.test();
     }
     
     setupUI()
@@ -48,6 +57,24 @@
     setupEventHandlers()
     {
       let view=this;
+
+      $(".wsdl-load-dialog").on("click", ".check-box", (evt) =>
+      {
+        let $checbox = $(evt.currentTarget);
+        let state = $checbox.attr("data-state") == "on" ? "off" : "on";
+        $checbox.attr("data-state", state);
+
+        if($checbox.hasClass("select-all-operations"))
+        {
+          $(".wsdl-load-dialog .operation .check-box").attr("data-state", state);
+        }
+        else
+        {
+          let selectedCount=$(".wsdl-load-dialog .operation .check-box[data-state='on']").get().length;
+          let totalCount=$(".wsdl-load-dialog .operation .check-box").get().length;
+          $(".wsdl-load-dialog .select-all-operations").attr("data-state", selectedCount==totalCount ? "on": "off");
+        }
+      })
 
       $(".upload").on("change", (evt)=>
       {
@@ -62,6 +89,7 @@
       view._updatePanels=()=>window.setTimeout(()=>view.updatePanels(), 10);
       view._updateTabScrollPosition=()=>window.setTimeout(()=>view.updateTabScrollPosition(), 0);
       view._saveWS=zn.utils.debounce(()=>view.saveWS(), 300);
+
     }
 
     loadConfig()
@@ -95,19 +123,11 @@
       
       view.client=client;
 
-      /*console.info("[APIi]", `connecting to agent at ${view.config.proxy}`)
-      view.socket=io(`${view.config.proxy}`,{
-        path: "/apii/agent",
-        withCredentials: true
-      });
-      view.socket.on("connect", ()=>
+      apii.xml.JSDom.fetch=(url, options)=>
       {
-        console.info("[APIi]", `connected to agent at ${view.config.proxy}`);
-        console.info("[APIi]", `announcing to agent`);
-        view.socket.emit("/apii/announce", {oid: view.config.oid});
-      })
-      view.socket.on("/apii/announce/ack", (socmsg)=>console.info("[APIi]", `announcing acknowledged by agent`));
-      view.socket.on("/apii/receive", (socmsg)=>view.onReceive(socmsg));*/
+        return view.client.fetch(url, options);
+      }
+
     }
 
     emptyWS()
@@ -233,6 +253,7 @@
       let view=this;
 
       view.editors.request.setValue(view.inspection.request.content);
+      view.editors.request.setOption("mode", view.contentMode(view.inspection.request.headers));
       $(".service-req .panel-body").scrollTop(0);
 
       view.editors.response.setValue(view.inspection.response.content);
@@ -919,7 +940,7 @@
       let view=this;
       view.formatResponse(inspection);
       view.inspection.response=inspection.response;
-      if(inspection.response.time) view.sendTime=Math.round(inspection.response.time * 1000 + 0.5)/1000;
+      //if(inspection.response.time) view.sendTime=Math.round(inspection.response.time * 1000 + 0.5)/1000;
 
       view.apply();
       view.updatePanels();
@@ -988,19 +1009,203 @@
       window.location=zn.defn.data["agent-package"];
     }
 
-
-    test()
+    showWSMenu($evt)
     {
-      window.__agentclient=new apii.agent.Client({endpoint: "http://localhost:8181", oid: "TEST"});
-      window.__agentclient.connect();
-  
-      apii.xml.Utils.fetch("https://www.crcind.com/csp/samples/SOAP.Demo.CLS?WSDL=1").then((doms)=>
-      {
-        console.log(doms);
-      });
-    }
-  }
+      let view=this;
 
+      $evt && $evt.preventDefault();
+      $evt && $evt.stopPropagation();
+
+      let popup=zn.ui.components.Popup.get("ws-menu");
+      popup.show({left: 85, top: 50});
+    }
+
+    onWSMenuAction(action)
+    {
+      let view=this;
+      let popup=zn.ui.components.Popup.get("ws-menu");
+      popup.hide();
+
+      if(action=="edit") view.showEditWSDialog('edit');
+      if(action=="delete") view.deleteWorkspace();
+      if(action=="add-set") view.showEditSetDialog('new', null, null);
+      if(action=="add-wsdl") view.showWSDLLoadDialog();
+    }
+
+    showWSDLLoadDialog()
+    {
+      let view=this;
+      view.loadwsdl={};
+      view.wsdlData=
+      {
+        portTypes: [],
+        portTypeOperations: {},
+        selectedPortType: ""
+      }
+      let dialog=zn.ui.components.Dialog.get("wsdl-load-dialog");
+      dialog.show();
+    }
+  
+    onWSDLLoadDialogAction($evt)
+    {
+      let view=this;
+
+      if($evt.action=="cancel") return;
+      if($evt.action=="ok") view.addSetFromWSDL();
+    }
+
+    async loadWSDL()
+    {
+      let view=this;
+      view.wsdlData=
+      {
+        portTypes: [],
+        portTypeOperations: {},
+        selectedPortType: ""
+      }
+      view.apply();
+
+      let wsdl=new apii.xml.WSDL();
+      try
+      {
+        await wsdl.fetch(view.loadwsdl.url, 
+        {
+          onprogress: (msg)=>
+          {
+            view.loadwsdl.msg=msg;
+            view.apply();
+          }
+        });
+        view.loadwsdl.msg="";
+        view.apply();
+        view.wsdl=wsdl;
+        console.log(view.wsdl);
+        view.processWSDL(wsdl);
+      }
+      catch(ex)
+      {
+        console.log(ex);
+        view.loadwsdl.msg=`Error occured while loading wsdl ${ex}`;
+        view.apply();
+      }
+    }
+
+    processWSDL(wsdl)
+    {
+      let view=this;
+      let soapPortData=wsdl.getSOAPPort();
+
+      view.wsdlData=
+      {
+        portTypes: soapPortData.portTypes.map((portType)=>{return {value: portType, label: portType}}),
+        portTypeOperations: soapPortData.portTypeOperations,
+        selectedPortType: ""
+      }
+
+      view.wsdlData.selectedPortType=view.wsdlData.portTypes[0].value;
+      view.loadwsdl.setName=view.wsdlData.portTypes[0].value;
+      view.loadwsdl.setDescr=`Inspections for wsdl at location ${view.loadwsdl.url}`;
+      view.dialogActions["WSDL-LOAD"]=
+      [
+        {action: "ok", label: "Ok", autohide: false},
+        {action: "cancel", label: "Cancel"}
+      ]
+      view.apply();
+    }
+
+    onWSDLPortTypeChange($evt)
+    {
+      let view=this;
+      view.loadwsdl.setName=$evt.newValue;
+      $(".wsdl-load-dialog .select-all-operations").attr("data-state", "on");
+      view.apply();
+    }
+
+    emptySOAPEnvelope()
+    {
+      return {
+        Envelope:
+        {
+          $ns: "http://schemas.xmlsoap.org/soap/envelope/",
+          Header: {$ns: "http://schemas.xmlsoap.org/soap/envelope/"},
+          Body: {$ns: "http://schemas.xmlsoap.org/soap/envelope/"},
+        }
+      }
+    }
+
+    addSetFromWSDL()
+    {
+      let view=this;
+      let selectedOperations=$(".wsdl-load-dialog .operation .check-box[data-state='on']");
+      if(selectedOperations.get().length==0)
+      {
+        view.loadwsdl.msg="Please select at least one operation to create the inspection set";
+        view.apply();
+        return;
+      }
+      view.loadwsdl.msg="";
+      let dialog=zn.ui.components.Dialog.get("wsdl-load-dialog");
+      dialog.hide();
+
+      let newSet={oid: zn.shortid(), name: view.loadwsdl.setName, descr: view.loadwsdl.setDescr, inspections: []};
+      view.ws.sets.push(newSet);
+
+      let oxsd=new apii.xml.XSD();
+      oxsd.schemas=view.wsdl.schemas;
+      oxsd.createSchemaMap();
+      console.log(oxsd.schemaMap);
+
+      view.wsdl.ns["soap-env"]="http://schemas.xmlsoap.org/soap/envelope/";
+
+      let operationsMap=view.wsdlData.portTypeOperations[view.wsdlData.selectedPortType].reduce((a,c)=>{a[c["@name"]]=c;return a}, {});
+      selectedOperations.each((i, e)=>
+      {
+        let selectedOperationName=$(e).attr("data-oper-name");
+        let selectedOperation=operationsMap[selectedOperationName];
+        
+        console.log(`generating input data for operation ${selectedOperationName}`);
+        let jsdom=new apii.xml.JSDom();
+        let obj=oxsd.createObject(selectedOperation.inputElement.name, selectedOperation.inputElement.ns);
+        jsdom.ns=view.wsdl.ns;
+        jsdom.doc=view.emptySOAPEnvelope();
+        jsdom.doc.Envelope.Body={...jsdom.doc.Envelope.Body, ...obj};
+        let requestContent=jsdom.generate(2);
+
+        let operationInspection=
+        {
+          name: selectedOperationName,
+          setOid: newSet.oid,
+          oid: zn.shortid(),
+          target: {method: "POST", endpoint: selectedOperation.endPoint},
+          request: {headers:[{header: "content-type", value: "text/xml"},{header: "soap-action", value: selectedOperation.soapAction}], content: requestContent},
+          response: {headers:[{header: "", value: ""},{header: "", value: ""},],content: ""}
+        }
+        view.ws.inspections[operationInspection.oid]=operationInspection;
+        newSet.inspections.push(operationInspection.oid);
+      })
+
+      view.apply();
+      view.saveWS();
+    }
+
+    nameToLabelText(n)
+    {
+      let rval=[...n].reduce((a,c,i)=>
+      {
+        let code=c.charCodeAt(0);
+        let ch=c;
+
+        if(i==0) ch=ch.toUpperCase();
+        if(a=="_" || (code>=65 && code<=90)) ch=" "+ch;
+        a+=ch;
+
+        return a;
+      }, "");
+
+      return rval;
+    }
+
+  }
 
   __package.split(".").reduce((a, e) => a[e] = a[e] || {}, window)[__name] = View;
 

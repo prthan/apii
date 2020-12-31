@@ -34,8 +34,8 @@
 .navigator .app-header .app-action:hover 
 {
   color: rgb(205, 231, 249);
-  background-color: rgb(84, 109, 121);
-  border-color: rgb(94, 122, 135);
+  /*background-color: rgb(84, 109, 121);
+  border-color: rgb(94, 122, 135);*/
 }
 
 
@@ -49,11 +49,10 @@
   background-color: #38474e;
   padding: 10px;
   position: relative;
-  min-height: 65px;
 }
 
 .navigator .ws-header .item-actions {position: absolute; right: 0px; top: 2px; cursor: pointer; text-align: center;}
-.navigator .ws-header .item-actions .item-action {display: block}
+.navigator .ws-header .item-actions .item-action {}
 .navigator .ws-header .item-actions .add-set {font-size: 14px;}
 .navigator .ws-header:hover .item-actions {display: inline-block;}
 .navigator .ws-header .ws-name
@@ -61,6 +60,7 @@
   color: #dbf0ffa6;
   font-size: 15px;
   font-weight: 500;
+  height: 21px;
 }
 
 .navigator .ws-header .ws-descr
@@ -88,6 +88,7 @@
   padding: 3px 0px;
   border: 1px solid transparent;
   cursor: pointer; 
+  background-color: #4e6671;
 }
 .set .set-name:hover {background-color: #49606b;}
 .set .set-name .icon
@@ -132,8 +133,8 @@
   font-size: 2px;
   color: #a7bbc9;
   position: absolute;
-  left: 24px;
-  top: 5px;
+  left: 21px;
+  top: 0px;
 }
 .set .inspection .state-indicator span {display: none;}
 .set .inspection[data-state="open"] .state-indicator span {display: inline-block;}
@@ -141,17 +142,22 @@
 .set .inspection .icon
 {
   font-size: 12px;
-  padding-right: 10px;
+  padding-right: 0px;
   padding-top: 1px;  
   padding-left: 8px;
+  height: 20px;
 }
+
+.set .inspection .icon img {width: 20px; height: 20px}
 
 .set .inspection .text
 {
   font-size: 11px;
   font-weight: 500;
   color: #dbf0ffa6;
-  text-decoration: none;  
+  text-decoration: none;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .set .inspection:hover .item-actions {display: inline-block;}
@@ -496,3 +502,28 @@
 
 .agent-link {color: #bcbcbc; text-decoration: none;}
 .agent-link i {display: inline-block; padding-right: 5px;}
+
+.wsdl-load-dialog .zn-dialog-wrapper {width: 500px;}
+.wsdl-load-dialog .status-message {word-break: break-all; color: #808080}
+.wsdl-load-dialog .operations {margin-bottom: 20px;}
+.wsdl-load-dialog .operations-list 
+{
+  max-height: 215px; 
+  overflow-y: auto; 
+  background-color: #ffffff;
+  border: 1px solid #e2e2e2;
+}
+.wsdl-load-dialog .operations-list .operation 
+{
+  border-bottom: 1px solid #f5f5f5;
+  padding: 3px;
+}
+.wsdl-load-dialog .operations-list .operation:last-of-type {border-bottom: none;} 
+.wsdl-load-dialog .operations-list .operation .oper-name {font-size: 13px;}
+.wsdl-load-dialog .load-wsdl-btn-wrapper {padding-left: 15px; padding-top: 19px}
+.wsdl-load-dialog .load-wsdl-btn-wrapper .zn-button {padding-top: 4px; padding-bottom: 4px}
+.wsdl-load-dialog .check-box .state-on {display: none;color: #7f8d98;}
+.wsdl-load-dialog .check-box .state-off {color: #bcbcbc;}
+.wsdl-load-dialog .check-box[data-state="on"] .state-off {display: none;}
+.wsdl-load-dialog .check-box[data-state="on"] .state-on {display: inline-block;}
+.wsdl-load-dialog [zn-textarea] {height: 105px;}

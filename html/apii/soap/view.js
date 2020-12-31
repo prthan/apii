@@ -45,17 +45,30 @@
     async test()
     {
       let view=this;
-      let wsdlURL="https://www.crcind.com/csp/samples/SOAP.Demo.CLS?WSDL=1";
+      //let wsdlURL="https://www.crcind.com/csp/samples/SOAP.Demo.CLS?WSDL=1";
       //let wsdlURL="http://www.dneonline.com/calculator.asmx?WSDL";
       //let wsdlURL="https://130.61.41.75/soa-infra/services/reseq-poc/Sample/bpelprocess1_client_ep?WSDL";
+      let wsdlURL="https://edpe-test.fin.us2.oraclecloud.com/fscmService/ErpIntegrationService?WSDL";
       apii.xml.JSDom.fetch=(url, options)=>
       {
         return view.client.fetch(url, options);
       }
       let wsdl=new apii.xml.WSDL();
-      await wsdl.fetch(wsdlURL);
+      await wsdl.fetch(wsdlURL, {
+        onprogress: (msg)=>console.log(msg)
+      });
       console.log(wsdl);
-      //let nsmap=Object.keys(wsdl.ns).reduce((a,c)=>{a[wsdl.ns[c]]=c; return a}, {});
+      console.log(wsdl.getSOAPPort());
+      let xsd=new apii.xml.XSD();
+      xsd.schemas=wsdl.schemas;
+      xsd.createSchemaMap();
+      console.log(xsd.schemaMap);
+      
+      let dom=new apii.xml.JSDom();
+      dom.ns=wsdl.ns;
+      dom.doc=xsd.createObject("getESSJobStatus", "http://xmlns.oracle.com/apps/financials/commonModules/shared/model/erpIntegrationService/types/");
+      console.log(dom.generate(2));
+
       //let dom=new apii.xml.JSDom();
       //console.log(dom.generateNode(wsdl.doc.definitions.types.schema, "schema", 2, nsmap));
       //console.log(wsdl.generate(2));
