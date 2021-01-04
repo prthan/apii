@@ -7,6 +7,11 @@
   "scripts"      : ["module/index.js", "module/send.js", "module/agent-client.js", "xml/jsdom.js", "xml/utils.js", "xml/wsdl.js", "xml/xsd.js"],
   "style"        : "module/index.css",
   
+  "manifest"     :
+  {
+
+  },
+
   "includes":
   {
     "scripts"    : ["../app.js"],

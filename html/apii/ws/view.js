@@ -44,8 +44,7 @@
       view.setupUI();
       view.setupEventHandlers();
       view.loadConfig();
-      view.loadWS();
-      view.connectToAgent();
+      if(view.loadWS()) view.connectToAgent();
     }
     
     setupUI()
@@ -156,7 +155,7 @@
           window.localStorage.setItem(`/apii/workspace/${ws.oid}`, JSON.stringify(ws));
         }
         window.location.hash=`#!/ws/${currentws}`;
-        return;
+        return false;
       }
       let ws=window.localStorage.getItem(`/apii/workspace/${view.options.routeValues.id}`);
       if(ws!=null)
@@ -175,6 +174,7 @@
         
         view.apply();
       }
+      return true;
     }
 
     saveWS()

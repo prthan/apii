@@ -17,6 +17,6 @@
   },
 
   "context": "/apii/agent",
-  "origin": "http://localhost:8080"
+  "origin": "https://localhost"
 
 }

@@ -14,9 +14,12 @@
     init()
     {
       let module = this;
-      let impl=(res, rej)=>
+      
+      let impl=async(res, rej)=>
       {
-        console.log("[APIi]","module initialized");
+        let swreg=await navigator.serviceWorker.register(zn.env.sw, {scope: "."});
+        console.info("[APIi]", 'ServiceWorker ==> registered')
+        console.info("[APIi]","module initialized");
         res();
       }
 

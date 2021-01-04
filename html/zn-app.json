@@ -45,6 +45,8 @@
 
   "bundled": "Y",
   
+  "pwa": "Y",
+
   "environments":
   {
     "dev":
@@ -52,14 +54,16 @@
       "ctx": "/",
       "api": "/api",
       "res": "/res",
-      "images": "/res/images"
+      "images": "/res/images",
+      "sw": "/sw.js"
     },
     "prod":
     {
       "ctx": "/apii",
       "api": "/api",
       "res": "/apii/res",
-      "images": "/apii/res/images"
+      "images": "/apii/res/images",
+      "sw": "/apii/sw.js"
     }
 
   }
