@@ -55,7 +55,8 @@
       "api": "/api",
       "res": "/res",
       "images": "/res/images",
-      "sw": "/sw.js"
+      "sw": "/sw.js",
+      "agent-package": "https://github.com/prthan/apii/releases/download/v0.3-alpha/agent.zip"
     },
     "prod":
     {
@@ -63,7 +64,8 @@
       "api": "/api",
       "res": "/apii/res",
       "images": "/apii/res/images",
-      "sw": "/apii/sw.js"
+      "sw": "/apii/sw.js",
+      "agent-package": "https://github.com/prthan/apii/releases/download/v0.3-alpha/agent.zip"
     }
 
   }

@@ -932,7 +932,12 @@
         }
         inspection.response.content=html_beautify(content, options);
       }
-
+      
+      if(headersMap["content-type"] && headersMap["content-type"].indexOf("text/xml")==0)
+      {
+        let jsdom=new apii.xml.JSDom(content);
+        inspection.response.content=jsdom.generate(2);
+      }
     }
 
     onReceive(inspection)
@@ -1006,7 +1011,7 @@
 
     downloadAgent()
     {
-      window.location=zn.defn.data["agent-package"];
+      window.location=zn.env["agent-package"];
     }
 
     showWSMenu($evt)
@@ -1169,6 +1174,7 @@
         jsdom.ns=view.wsdl.ns;
         jsdom.doc=view.emptySOAPEnvelope();
         jsdom.doc.Envelope.Body={...jsdom.doc.Envelope.Body, ...obj};
+        jsdom.instructions.push({name: 'xml', body: `version="1.0"`});
         let requestContent=jsdom.generate(2);
 
         let operationInspection=

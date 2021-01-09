@@ -9,6 +9,7 @@
     {
       this.doc=null;
       this.ns={};
+      this.instructions=[];
       if(data) this.parse(data);
     }
 
@@ -45,6 +46,10 @@
       }
       saxparser.ontext=(text)=>obj.$value=text;
       saxparser.oncdata=(text)=>obj.$value=text;
+      saxparser.onprocessinginstruction=(instruction)=>
+      {
+        jsdom.instructions.push(instruction);
+      }
       saxparser.write(data).close();
       
       jsdom.doc=obj;
@@ -66,7 +71,9 @@
       let dom=this;
       let rootName=Object.keys(dom.doc)[0];
       let nsmap=Object.keys(dom.ns).reduce((a,c)=>{a[dom.ns[c]]=c; return a}, {});
-      return dom.generateNode(dom.doc[rootName], rootName, indent, nsmap);
+      let instructions=dom.instructions.reduce((a,c)=>a+=`<?${c.name} ${c.body}?>\n`, "");
+
+      return instructions + dom.generateNode(dom.doc[rootName], rootName, indent, nsmap);
     }
 
     generateNode(o, name, indent, nsmap, level)

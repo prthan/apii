@@ -17,7 +17,7 @@
       
       let impl=async(res, rej)=>
       {
-        let swreg=await navigator.serviceWorker.register(zn.env.sw, {scope: "."});
+        let swreg=await navigator.serviceWorker.register(zn.env.sw);
         console.info("[APIi]", 'ServiceWorker ==> registered')
         console.info("[APIi]","module initialized");
         res();
